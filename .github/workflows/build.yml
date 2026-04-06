@@ -2,7 +2,7 @@ name: Android Build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   workflow_dispatch:
 
 jobs:
@@ -19,39 +19,35 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 🔥 Переходим в папку проекта
-      - name: Enter project folder
-        run: cd v2rayNG-master
-
-      # 📦 Создаём jniLibs
+      # 📦 Создаём папки ПРАВИЛЬНО
       - name: Prepare jniLibs
         run: |
-          mkdir -p v2rayNG-master/app/src/main/jniLibs/arm64-v8a
-          mkdir -p v2rayNG-master/app/src/main/jniLibs/armeabi-v7a
+          mkdir -p v2rayNG/app/src/main/jniLibs/arm64-v8a
+          mkdir -p v2rayNG/app/src/main/jniLibs/armeabi-v7a
 
-      # 🔽 Скачиваем core
+      # 🔥 Скачиваем core ПРАВИЛЬНО
       - name: Download libv2ray
         run: |
-          curl -L -o v2rayNG-master/app/src/main/jniLibs/arm64-v8a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_arm64-v8a.so
-          curl -L -o v2rayNG-master/app/src/main/jniLibs/armeabi-v7a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_armeabi-v7a.so
+          curl -L -o v2rayNG/app/src/main/jniLibs/arm64-v8a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_arm64-v8a.so
+          curl -L -o v2rayNG/app/src/main/jniLibs/armeabi-v7a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_armeabi-v7a.so
 
-      # 🔍 Проверка
+      # 🔍 Проверка (очень важно)
       - name: Verify libs
-        run: ls -R v2rayNG-master/app/src/main/jniLibs
+        run: ls -R v2rayNG/app/src/main/jniLibs
 
       # ⚙️ Делаем gradlew исполняемым
       - name: Make gradlew executable
-        run: chmod +x v2rayNG-master/gradlew
+        run: chmod +x v2rayNG/gradlew
 
       # 🏗️ Сборка
       - name: Build APK
         run: |
-          cd v2rayNG-master
+          cd v2rayNG
           ./gradlew assembleDebug
 
-      # 📤 Отдаём APK
+      # 📤 APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: v2rayNG-master/app/build/outputs/apk/debug/app-debug.apk
+          path: v2rayNG/app/build/outputs/apk/debug/app-debug.apk
