@@ -31,10 +31,10 @@ jobs:
           curl -L -o v2rayNG/app/src/main/jniLibs/armeabi-v7a/libv2ray.so \
             https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_armeabi-v7a.so
 
+      # 🔥 ВАЖНО: используем project-dir
       - name: Build APK
-        run: |
-          cd v2rayNG
-          gradle assembleDebug
+        run: gradle assembleDebug
+        working-directory: v2rayNG
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
