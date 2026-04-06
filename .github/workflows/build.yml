@@ -19,31 +19,29 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 📦 Создаём папки ПРАВИЛЬНО
+      # 📦 jniLibs (ПРАВИЛЬНЫЙ ПУТЬ)
       - name: Prepare jniLibs
         run: |
           mkdir -p v2rayNG/app/src/main/jniLibs/arm64-v8a
           mkdir -p v2rayNG/app/src/main/jniLibs/armeabi-v7a
 
-      # 🔥 Скачиваем core ПРАВИЛЬНО
+      # 🔥 core
       - name: Download libv2ray
         run: |
           curl -L -o v2rayNG/app/src/main/jniLibs/arm64-v8a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_arm64-v8a.so
           curl -L -o v2rayNG/app/src/main/jniLibs/armeabi-v7a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_armeabi-v7a.so
 
-      # 🔍 Проверка (очень важно)
+      # 🔍 проверка
       - name: Verify libs
         run: ls -R v2rayNG/app/src/main/jniLibs
 
-      # ⚙️ Делаем gradlew исполняемым
+      # ⚙️ gradlew В КОРНЕ!
       - name: Make gradlew executable
-        run: chmod +x v2rayNG/gradlew
+        run: chmod +x gradlew
 
-      # 🏗️ Сборка
+      # 🏗️ сборка из подпапки
       - name: Build APK
-        run: |
-          cd v2rayNG
-          ./gradlew assembleDebug
+        run: ./gradlew :v2rayNG:assembleDebug
 
       # 📤 APK
       - name: Upload APK
