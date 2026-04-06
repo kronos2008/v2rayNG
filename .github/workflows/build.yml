@@ -21,30 +21,38 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      # ⚙️ Gradle (без gradlew)
+      # ⚙️ Gradle
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      # 📦 Папки под core
+      # 🔍 Найдём где реально проект
+      - name: Find project dir
+        id: finddir
+        run: |
+          DIR=$(find . -name "settings.gradle" -o -name "settings.gradle.kts" | head -n 1 | xargs dirname)
+          echo "DIR=$DIR" >> $GITHUB_OUTPUT
+          echo "Project dir: $DIR"
+
+      # 📦 jniLibs
       - name: Prepare jniLibs
         run: |
-          mkdir -p v2rayNG/app/src/main/jniLibs/arm64-v8a
-          mkdir -p v2rayNG/app/src/main/jniLibs/armeabi-v7a
+          mkdir -p ${{ steps.finddir.outputs.DIR }}/app/src/main/jniLibs/arm64-v8a
+          mkdir -p ${{ steps.finddir.outputs.DIR }}/app/src/main/jniLibs/armeabi-v7a
 
-      # 🔥 Скачиваем V2Ray core (фикс краша)
+      # 🔥 core
       - name: Download libv2ray
         run: |
-          curl -L -o v2rayNG/app/src/main/jniLibs/arm64-v8a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_arm64-v8a.so
-          curl -L -o v2rayNG/app/src/main/jniLibs/armeabi-v7a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_armeabi-v7a.so
+          curl -L -o ${{ steps.finddir.outputs.DIR }}/app/src/main/jniLibs/arm64-v8a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_arm64-v8a.so
+          curl -L -o ${{ steps.finddir.outputs.DIR }}/app/src/main/jniLibs/armeabi-v7a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_armeabi-v7a.so
 
       # 🔍 Проверка
       - name: Verify libs
-        run: ls -R v2rayNG/app/src/main/jniLibs
+        run: ls -R ${{ steps.finddir.outputs.DIR }}/app/src/main/jniLibs
 
-      # 🏗️ СБОРКА (ГЛАВНЫЙ ФИКС)
+      # 🏗️ СБОРКА (без угадываний пути)
       - name: Build APK
         run: |
-          cd v2rayNG
+          cd ${{ steps.finddir.outputs.DIR }}
           gradle assembleDebug
 
       # 📤 APK
@@ -52,4 +60,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: v2rayNG/app/build/outputs/apk/debug/app-debug.apk
+          path: |
+            **/build/outputs/apk/debug/*.apk
