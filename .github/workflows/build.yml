@@ -1,56 +1,46 @@
-name: Build APK + libs
+name: Build APK
 
 on:
+  push:
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
 
-    - name: Clone v2rayNG
-      run: git clone https://github.com/2dust/v2rayNG.git
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
 
-    - name: Setup JDK
-      uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: 17
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
 
-    - name: Install Gradle
-      run: sudo apt-get update && sudo apt-get install -y gradle
+      - name: Install gomobile
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@latest
+          go install golang.org/x/mobile/cmd/gobind@latest
+          gomobile init
 
-    # 👉 скачиваем либы отдельно
-    - name: Download libv2ray
-      run: |
-        mkdir -p output_libs/arm64-v8a
-        mkdir -p output_libs/armeabi-v7a
+      - name: Build libv2ray.aar from submodule
+        run: |
+          cd AndroidLibXrayLite
+          go mod download
+          gomobile bind -v -androidapi 21 -ldflags="-w -s" -target=android ./
+          cp libv2ray.aar ../V2rayNG/app/libs/libv2ray.aar
 
-        curl -L -o output_libs/arm64-v8a/libv2ray.so \
-          https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_arm64-v8a.so
+      - name: Build Debug APK
+        working-directory: V2rayNG
+        run: ./gradlew assembleDebug
 
-        curl -L -o output_libs/armeabi-v7a/libv2ray.so \
-          https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_armeabi-v7a.so
-
-    # 👉 билд (ВАЖНО: через :app)
-    - name: Build APK
-      run: |
-        cd v2rayNG
-        gradle :app:assembleDebug
-
-    # 👉 выгрузка APK
-    - name: Upload APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: apk
-        path: v2rayNG/app/build/outputs/apk/debug/*.apk
-
-    # 👉 выгрузка либ
-    - name: Upload libv2ray
-      uses: actions/upload-artifact@v4
-      with:
-        name: libv2ray
-        path: output_libs/
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: true-vpn-debug
+          path: V2rayNG/app/build/outputs/apk/**/*.apk
