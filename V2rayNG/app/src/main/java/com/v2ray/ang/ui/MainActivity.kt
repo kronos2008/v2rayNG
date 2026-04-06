@@ -98,20 +98,20 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
         mainViewModel.reloadServerList()
 
         // Автодобавление подписки True VPN если её нет
-        lifecycleScope.launch(Dispatchers.IO) {
-            val subs = mainViewModel.getSubscriptions(this@MainActivity)
-            if (subs.none { it.remarks == "True VPN" }) {
-                AngConfigManager.importBatchConfig(
-                    "https://de-vpn.mooo.com/sub/bzfjg83k1gif3l8d",
-                    "", false
-                )
-                withContext(Dispatchers.Main) {
-                    setupGroupTab()
-                    importConfigViaSub()
-                }
-            }
+        // Автодобавление подписки True VPN если её нет
+lifecycleScope.launch(Dispatchers.IO) {
+    val subs = mainViewModel.getSubscriptions(this@MainActivity)
+    if (subs.none { it.remarks == "True VPN" }) {
+        AngConfigManager.importBatchConfig(
+            "https://de-vpn.mooo.com/sub/bzfjg83k1gif3l8d",
+            "", false
+        )
+        withContext(Dispatchers.Main) {
+            setupGroupTab()
+            importConfigViaSub()
         }
-
+    }
+}
         checkAndRequestPermission(PermissionType.POST_NOTIFICATIONS) {}
     }
 
