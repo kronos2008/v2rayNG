@@ -149,20 +149,28 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun handleFabAction() {
-        applyRunningState(isLoading = true, isRunning = false)
-        if (mainViewModel.isRunning.value == true) {
-            V2RayServiceManager.stopVService(this)
-        } else if (SettingsManager.isVpnMode()) {
-            try {
-                val intent = VpnService.prepare(this)
-                if (intent == null) startV2Ray()
-                else requestVpnPermission.launch(intent)
-            } catch (e: Exception) {
-                startV2Ray()
+    if (mainViewModel.isRunning.value == true) {
+        V2RayServiceManager.stopVService(this)
+        return
+    }
+    if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+        toast(R.string.title_file_chooser)
+        return
+    }
+    if (SettingsManager.isVpnMode()) {
+        try {
+            val intent = VpnService.prepare(this)
+            if (intent == null) {
+                V2RayServiceManager.startVService(this)
+            } else {
+                requestVpnPermission.launch(intent)
             }
-        } else {
-            startV2Ray()
+        } catch (e: Exception) {
+            V2RayServiceManager.startVService(this)
         }
+    } else {
+        V2RayServiceManager.startVService(this)
+    }
     }
 
     private fun startV2Ray() {
