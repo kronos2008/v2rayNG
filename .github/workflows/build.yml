@@ -38,18 +38,18 @@ jobs:
 
       - name: Build Debug APK
         working-directory: V2rayNG
-        run: ./gradlew assembleFdroidDebug
+        run: ./gradlew assemblePlaystoreDebug
         env:
-          ABI_FILTERS: "arm64-v8a;armeabi-v7a" 
-
+          ABI_FILTERS: "arm64-v8a;armeabi-v7a"
+          
       - name: Upload arm64 APK
         uses: actions/upload-artifact@v4
         with:
           name: true-vpn-arm64
-          path: V2rayNG/app/build/outputs/apk/fdroid/debug/*arm64*.apk
+          path: V2rayNG/app/build/outputs/apk/playstore/debug/*arm64*.apk
 
       - name: Upload arm32 APK
         uses: actions/upload-artifact@v4
         with:
           name: true-vpn-arm32
-          path: V2rayNG/app/build/outputs/apk/fdroid/debug/*armeabi*.apk
+          path: V2rayNG/app/build/outputs/apk/playstore/debug/*armeabi*.apk
