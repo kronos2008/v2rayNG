@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
- build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,11 +20,10 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    # ставим gradle
     - name: Install Gradle
       run: sudo apt-get update && sudo apt-get install -y gradle
 
-    # качаем либы отдельно
+    # 👉 скачиваем либы отдельно
     - name: Download libv2ray
       run: |
         mkdir -p output_libs/arm64-v8a
@@ -36,20 +35,20 @@ jobs:
         curl -L -o output_libs/armeabi-v7a/libv2ray.so \
           https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_armeabi-v7a.so
 
-    # билд через gradle (без gradlew)
+    # 👉 билд (ВАЖНО: через :app)
     - name: Build APK
       run: |
         cd v2rayNG
-        gradle assembleDebug
+        gradle :app:assembleDebug
 
-    # apk
+    # 👉 выгрузка APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: apk
         path: v2rayNG/app/build/outputs/apk/debug/*.apk
 
-    # либы
+    # 👉 выгрузка либ
     - name: Upload libv2ray
       uses: actions/upload-artifact@v4
       with:
