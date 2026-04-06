@@ -36,21 +36,18 @@ jobs:
           mkdir -p ../V2rayNG/app/libs
           cp libv2ray.aar ../V2rayNG/app/libs/libv2ray.aar
 
-      - name: Generate Keystore
+      - name: Decode Keystore
         run: |
-          keytool -genkey -v -keystore truevpn.keystore \
-            -alias truevpn -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=TrueVPN, OU=TrueVPN, O=TrueVPN, L=City, S=State, C=US" \
-            -storepass truevpn123 -keypass truevpn123
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > truevpn.keystore
 
       - name: Build Release APK
         working-directory: V2rayNG
         run: |
           ./gradlew assemblePlaystoreRelease \
             -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/truevpn.keystore \
-            -Pandroid.injected.signing.store.password=truevpn123 \
-            -Pandroid.injected.signing.key.alias=truevpn \
-            -Pandroid.injected.signing.key.password=truevpn123
+            -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
         env:
           ABI_FILTERS: "arm64-v8a;armeabi-v7a"
 
