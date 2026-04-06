@@ -19,7 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # 📦 jniLibs (ПРАВИЛЬНЫЙ ПУТЬ)
+      # ⚙️ Устанавливаем Gradle
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      # 📦 jniLibs
       - name: Prepare jniLibs
         run: |
           mkdir -p v2rayNG/app/src/main/jniLibs/arm64-v8a
@@ -35,13 +39,9 @@ jobs:
       - name: Verify libs
         run: ls -R v2rayNG/app/src/main/jniLibs
 
-      # ⚙️ gradlew В КОРНЕ!
-      - name: Make gradlew executable
-        run: chmod +x gradlew
-
-      # 🏗️ сборка из подпапки
+      # 🏗️ Сборка БЕЗ gradlew
       - name: Build APK
-        run: ./gradlew :v2rayNG:assembleDebug
+        run: gradle :v2rayNG:assembleDebug
 
       # 📤 APK
       - name: Upload APK
