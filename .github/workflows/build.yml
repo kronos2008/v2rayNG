@@ -18,6 +18,12 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Download libv2ray
+        run: |
+          mkdir -p V2rayNG/app/libs
+          wget -O V2rayNG/app/libs/libv2ray.aar \
+            https://github.com/2dust/AndroidLibXrayLite/releases/latest/download/libv2ray.aar
+
       - name: Build Debug APK
         working-directory: V2rayNG
         run: ./gradlew assembleDebug
