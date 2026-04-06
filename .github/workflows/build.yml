@@ -1,4 +1,4 @@
-name: Build APK + libv2ray
+name: Build APK + libs
 
 on:
   workflow_dispatch:
@@ -8,42 +8,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
     - name: Clone v2rayNG
       run: git clone https://github.com/2dust/v2rayNG.git
 
     - name: Setup JDK
       uses: actions/setup-java@v4
       with:
-        distribution: 'temurin'
-        java-version: '17'
+        distribution: temurin
+        java-version: 17
 
-    # 📥 качаем либу В ОТДЕЛЬНУЮ папку
+    # 👉 качаем либы ОТДЕЛЬНО
     - name: Download libv2ray
       run: |
         mkdir -p output_libs/arm64-v8a
         mkdir -p output_libs/armeabi-v7a
 
         curl -L -o output_libs/arm64-v8a/libv2ray.so \
-        https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_arm64-v8a.so
+          https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_arm64-v8a.so
 
         curl -L -o output_libs/armeabi-v7a/libv2ray.so \
-        https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_armeabi-v7a.so
+          https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_armeabi-v7a.so
 
-    # ⚠️ билдим БЕЗ либы внутри APK
+    # 👉 ПРАВИЛЬНАЯ папка
+    - name: Make gradlew executable
+      run: chmod +x v2rayNG/gradlew
+
+    # 👉 билд
     - name: Build APK
       run: |
         cd v2rayNG
-        chmod +x gradlew
         ./gradlew assembleDebug
 
-    # 📦 APK
+    # 👉 выгружаем APK
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: apk
+        name: v2rayNG-apk
         path: v2rayNG/app/build/outputs/apk/debug/*.apk
 
-    # 📦 ЛИБКИ ОТДЕЛЬНО
+    # 👉 выгружаем либы
     - name: Upload libv2ray
       uses: actions/upload-artifact@v4
       with:
