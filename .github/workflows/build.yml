@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 📥 Репо
+      # 📥 Клонируем
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -25,27 +25,29 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      # 📦 Папки под .so (ПРАВИЛЬНЫЙ путь)
+      # 📦 Папки под core
       - name: Prepare jniLibs
         run: |
           mkdir -p v2rayNG/app/src/main/jniLibs/arm64-v8a
           mkdir -p v2rayNG/app/src/main/jniLibs/armeabi-v7a
 
-      # 🔥 Скачиваем core (без него краш)
+      # 🔥 Скачиваем V2Ray core (фикс краша)
       - name: Download libv2ray
         run: |
           curl -L -o v2rayNG/app/src/main/jniLibs/arm64-v8a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_arm64-v8a.so
           curl -L -o v2rayNG/app/src/main/jniLibs/armeabi-v7a/libv2ray.so https://github.com/v2fly/v2ray-core/releases/latest/download/android_armeabi-v7a.so
 
-      # 🔍 Проверка (должны появиться 2 файла)
+      # 🔍 Проверка
       - name: Verify libs
         run: ls -R v2rayNG/app/src/main/jniLibs
 
-      # 🏗️ СБОРКА (КЛЮЧЕВОЙ ФИКС)
+      # 🏗️ СБОРКА (ГЛАВНЫЙ ФИКС)
       - name: Build APK
-        run: gradle assembleDebug
+        run: |
+          cd v2rayNG
+          gradle assembleDebug
 
-      # 📤 Готовый APK
+      # 📤 APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
