@@ -33,6 +33,7 @@ jobs:
           cd AndroidLibXrayLite
           go mod download
           gomobile bind -v -androidapi 21 -ldflags="-w -s" -target=android ./
+          mkdir -p ../V2rayNG/app/libs
           cp libv2ray.aar ../V2rayNG/app/libs/libv2ray.aar
 
       - name: Build Debug APK
