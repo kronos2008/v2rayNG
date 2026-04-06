@@ -9,112 +9,90 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#FF000000">
 
+        <!-- Тулбар без названия -->
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize" />
-
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout
+        <!-- Верхняя часть: таймер + кнопка + пинг -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
-            <androidx.coordinatorlayout.widget.CoordinatorLayout
-                android:id="@+id/main_content"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <!-- Таймер подключения -->
+            <TextView
+                android:id="@+id/tv_test_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/connection_not_connected"
+                android:textSize="14sp"
+                android:textColor="#AAFFFFFF"
+                android:paddingBottom="12dp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+            <!-- Большая круглая кнопка по центру -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/tasker_start_service"
+                android:src="@drawable/ic_play_24dp"
+                app:tint="@color/colorWhite"
+                app:fabSize="normal"
+                app:backgroundTint="#FF1DB954"
+                app:useCompatPadding="false" />
 
-                    <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/progress_bar"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:indeterminate="true"
-                        android:visibility="invisible"
-                        app:indicatorColor="@color/color_fab_active" />
+            <!-- Пинг под кнопкой -->
+            <TextView
+                android:id="@+id/tv_ping"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="13sp"
+                android:textColor="#FF1DB954"
+                android:paddingTop="10dp" />
 
-                    <com.google.android.material.tabs.TabLayout
-                        android:id="@+id/tab_group"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:tabIndicatorFullWidth="false"
-                        app:tabMode="scrollable"
-                        app:tabTextAppearance="@style/TabLayoutTextStyle" />
+        </LinearLayout>
 
-                    <androidx.viewpager2.widget.ViewPager2
-                        android:id="@+id/view_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:nextFocusRight="@+id/fab"
-                        android:scrollbars="vertical"
-                        android:layout_weight="1" />
+        <!-- Прогресс бар -->
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="invisible"
+            app:indicatorColor="@color/color_fab_active" />
 
-                    <LinearLayout
-                        android:id="@+id/layout_test"
-                        android:layout_width="match_parent"
-                        android:layout_height="@dimen/view_height_dp64"
-                        android:clickable="true"
-                        android:contentDescription="@string/connection_test_pending"
-                        android:focusable="true"
-                        android:nextFocusLeft="@+id/view_pager"
-                        android:nextFocusRight="@+id/fab"
-                        android:orientation="vertical">
+        <!-- Табы групп -->
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIndicatorFullWidth="false"
+            app:tabMode="scrollable"
+            app:tabTextAppearance="@style/TabLayoutTextStyle" />
 
-                        <View
-                            android:layout_width="wrap_content"
-                            android:layout_height="1dp"
-                            android:background="@color/divider_color_light" />
+        <!-- Список серверов -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="vertical" />
 
-                        <TextView
-                            android:id="@+id/tv_test_state"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="start|center"
-                            android:maxLines="2"
-                            android:minLines="1"
-                            android:paddingStart="@dimen/padding_spacing_dp16"
-                            android:text="@string/connection_test_pending"
-                            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
-
-                    </LinearLayout>
-                </LinearLayout>
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:layout_marginBottom="-16dp"
-                    android:layout_marginEnd="@dimen/padding_spacing_dp16">
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fab"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_marginBottom="@dimen/view_height_dp36"
-                        android:clickable="true"
-                        android:contentDescription="@string/tasker_start_service"
-                        android:focusable="true"
-                        android:nextFocusLeft="@+id/layout_test"
-                        android:src="@drawable/ic_play_24dp"
-                        app:tint="@color/colorWhite"
-                        app:useCompatPadding="true"
-                        app:layout_anchorGravity="bottom|right|end" />
-
-                </FrameLayout>
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
-        </RelativeLayout>
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -123,8 +101,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/menu_drawer">
-
-    </com.google.android.material.navigation.NavigationView>
+        app:menu="@menu/menu_drawer" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
