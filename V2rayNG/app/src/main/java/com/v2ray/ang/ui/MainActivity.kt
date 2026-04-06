@@ -174,12 +174,11 @@ class MainActivity : HelperBaseActivity(), NavigationView.OnNavigationItemSelect
     }
 
     private fun startV2Ray() {
-        if (MmkvManager.getSelectServer().isNullOrEmpty()) {
-            toast(R.string.title_file_chooser)
-            applyRunningState(false, false)
-            return
-        }
-        V2RayServiceManager.startVService(this)
+    if (MmkvManager.getSelectServer().isNullOrEmpty()) {
+        toast(R.string.title_file_chooser)
+        return
+    }
+    V2RayServiceManager.startVService(this)
     }
 
     fun restartV2Ray() {
