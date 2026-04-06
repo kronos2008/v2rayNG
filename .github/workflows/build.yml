@@ -16,21 +16,12 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Decode Keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > V2rayNG/app/release.keystore
-
-      - name: Build Release APK
+      - name: Build Debug APK
         working-directory: V2rayNG
-        run: |
-          ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/V2rayNG/app/release.keystore \
-            -Pandroid.injected.signing.store.password=${{ secrets.STORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: V2rayNG/app/build/outputs/apk/release/*.apk
+          name: true-vpn-debug
+          path: V2rayNG/app/build/outputs/apk/debug/*.apk
