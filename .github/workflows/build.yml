@@ -36,20 +36,32 @@ jobs:
           mkdir -p ../V2rayNG/app/libs
           cp libv2ray.aar ../V2rayNG/app/libs/libv2ray.aar
 
-      - name: Build Debug APK
+      - name: Generate Keystore
+        run: |
+          keytool -genkey -v -keystore truevpn.keystore \
+            -alias truevpn -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=TrueVPN, OU=TrueVPN, O=TrueVPN, L=City, S=State, C=US" \
+            -storepass truevpn123 -keypass truevpn123
+
+      - name: Build Release APK
         working-directory: V2rayNG
-        run: ./gradlew assemblePlaystoreDebug
+        run: |
+          ./gradlew assemblePlaystoreRelease \
+            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/truevpn.keystore \
+            -Pandroid.injected.signing.store.password=truevpn123 \
+            -Pandroid.injected.signing.key.alias=truevpn \
+            -Pandroid.injected.signing.key.password=truevpn123
         env:
           ABI_FILTERS: "arm64-v8a;armeabi-v7a"
-          
+
       - name: Upload arm64 APK
         uses: actions/upload-artifact@v4
         with:
           name: true-vpn-arm64
-          path: V2rayNG/app/build/outputs/apk/playstore/debug/*arm64*.apk
+          path: V2rayNG/app/build/outputs/apk/playstore/release/*arm64*.apk
 
       - name: Upload arm32 APK
         uses: actions/upload-artifact@v4
         with:
           name: true-vpn-arm32
-          path: V2rayNG/app/build/outputs/apk/playstore/debug/*armeabi*.apk
+          path: V2rayNG/app/build/outputs/apk/playstore/release/*armeabi*.apk
