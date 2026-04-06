@@ -1,9 +1,6 @@
 name: Build APK
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -11,33 +8,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - uses: gradle/gradle-build-action@v2
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
+      # ✅ Качаем ТОЛЬКО нужные либы (32 + 64)
       - name: Download libv2ray
         run: |
-          mkdir -p v2rayNG/app/src/main/jniLibs/arm64-v8a
-          mkdir -p v2rayNG/app/src/main/jniLibs/armeabi-v7a
+          mkdir -p app/src/main/jniLibs/arm64-v8a
+          mkdir -p app/src/main/jniLibs/armeabi-v7a
 
-          curl -L -o v2rayNG/app/src/main/jniLibs/arm64-v8a/libv2ray.so \
+          curl -L -o app/src/main/jniLibs/arm64-v8a/libv2ray.so \
             https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_arm64-v8a.so
 
-          curl -L -o v2rayNG/app/src/main/jniLibs/armeabi-v7a/libv2ray.so \
+          curl -L -o app/src/main/jniLibs/armeabi-v7a/libv2ray.so \
             https://github.com/2dust/v2rayNG/releases/download/1.8.5/libv2ray_armeabi-v7a.so
 
-      # 🔥 ВАЖНО: используем project-dir
+      - name: Verify libs
+        run: ls -R app/src/main/jniLibs
+
+      # ❗ ВАЖНО: билд из КОРНЯ через gradlew
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
       - name: Build APK
-        run: gradle assembleDebug
-        working-directory: v2rayNG
+        run: ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: v2rayNG-apk
-          path: v2rayNG/app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/debug/*.apk
